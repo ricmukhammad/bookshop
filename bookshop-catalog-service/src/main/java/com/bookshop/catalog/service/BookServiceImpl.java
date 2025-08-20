@@ -1,6 +1,7 @@
 package com.bookshop.catalog.service;
 
 import com.bookshop.catalog.dto.CreateBookParam;
+import com.bookshop.catalog.dto.CreateReviewParam;
 import com.bookshop.catalog.dto.GetBookParam;
 import com.bookshop.catalog.dto.PublicBookResult;
 import com.bookshop.catalog.mapper.BookMapper;
@@ -8,8 +9,10 @@ import com.bookshop.catalog.model.AudioBook;
 import com.bookshop.catalog.model.Book;
 import com.bookshop.catalog.model.EBook;
 import com.bookshop.catalog.model.ProductType;
+import com.bookshop.catalog.model.Review;
 import com.bookshop.catalog.model.VideoBook;
 import com.bookshop.catalog.repository.BookRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -109,26 +112,42 @@ public class BookServiceImpl implements BookService {
             }
 
             case VIDEOBOOK -> {
-                    book = VideoBook.builder()
-                                    .isbn(param.getIsbn())
-                                    .title(param.getTitle())
-                                    .authors(param.getAuthors())
-                                    .categories(param.getCategories())
-                                    .price(param.getPrice())
-                                    .cost(param.getCost())
-                                    .edition(param.getEdition())
-                                    .rating(param.getRating())
-                                    .reviews(param.getReviews())
-                                    .productType(ProductType.VIDEOBOOK)
-                                    .resolution(param.getResolution())
-                                    .format(param.getFormat())
-                                    .downloadLink(param.getDownloadLink())
-                                    .build();
+                book = VideoBook.builder()
+                                .isbn(param.getIsbn())
+                                .title(param.getTitle())
+                                .authors(param.getAuthors())
+                                .categories(param.getCategories())
+                                .price(param.getPrice())
+                                .cost(param.getCost())
+                                .edition(param.getEdition())
+                                .rating(param.getRating())
+                                .reviews(param.getReviews())
+                                .productType(ProductType.VIDEOBOOK)
+                                .resolution(param.getResolution())
+                                .format(param.getFormat())
+                                .downloadLink(param.getDownloadLink())
+                                .build();
             }
-            default -> throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Unsupported product type: " + param.getProductType());
+            default -> throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                                                          "Unsupported product type: " + param.getProductType());
         }
         return bookRepository.save(book);
     }
 
+    @Override
+    public Review addReview(String bookId, CreateReviewParam param) {
+        Book book = bookRepository.findBookById(bookId).orElseThrow(
+                ()-> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Book not found"));
+        var review = Review.builder()
+                           .userEmail(param.getEmail())
+                           .comment(param.getComment())
+                           .build();
 
+        if (book.getReviews() == null) {
+            book.setReviews(new ArrayList<>());
+        }
+        book.getReviews().add(review);
+        bookRepository.save(book);
+        return review;
+    }
 }

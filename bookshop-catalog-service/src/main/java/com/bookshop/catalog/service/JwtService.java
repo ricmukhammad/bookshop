@@ -1,21 +1,18 @@
-package com.bookshop.authservice.service;
+package com.bookshop.catalog.service;
 
-import com.bookshop.authservice.model.User;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import java.time.Instant;
+import java.nio.charset.StandardCharsets;
+import io.jsonwebtoken.Jws;
 import java.util.Base64;
-import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
-
     @Value("${jwt.secret}")
     private String jwtSecret;
 
@@ -26,16 +23,10 @@ public class JwtService {
         key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
     }
 
-    public String generateToken(User user) {
-        return Jwts.builder().subject(user.getId())
-                   .claim("email", user.getEmail())
-                   .claim("roles", user.getRoles())
-                   .expiration(Date.from(Instant.now().plusSeconds(3600)))
-                   .signWith(key)
-                   .compact();
-    }
-
     public Jws<Claims> validate(String token) {
-        return Jwts.parser().verifyWith((SecretKey) key).build().parseSignedClaims(token);
+        return Jwts.parser()
+                   .verifyWith(key)
+                   .build()
+                   .parseSignedClaims(token);
     }
 }

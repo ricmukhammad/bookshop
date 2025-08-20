@@ -23,4 +23,5 @@ public class User {
     private String providerSub; // Google sub
     private List<String> roles;
     private Instant createdAt;
+    private AuthProvider authProvider;
 }

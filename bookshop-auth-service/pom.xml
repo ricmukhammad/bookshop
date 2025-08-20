@@ -13,30 +13,10 @@
     <description>bookshop-auth-service</description>
     <properties>
         <java.version>17</java.version>
-        <io.jsonwebtoken.version>0.12.7</io.jsonwebtoken.version>
         <google.api.client>2.8.1</google.api.client>
     </properties>
 
     <dependencies>
-        <!-- JWT -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>${io.jsonwebtoken.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>${io.jsonwebtoken.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>${io.jsonwebtoken.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- Google Token verification -->
         <dependency>
             <groupId>com.google.api-client</groupId>

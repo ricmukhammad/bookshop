@@ -29,6 +29,10 @@ public class Book {
     private int rating;
     private List<Review> reviews;
     private int numberOfPages;
+    private String language;
+    private int yearOfPublication;
+    private String imageUrl;
+    private String description;
 }
 
 

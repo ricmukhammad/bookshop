@@ -40,6 +40,12 @@ public class CreateBookParam {
     @NotNull
     private ProductType productType;
     private int numberOfPages;
+    @NotBlank
+    private String language;
+    private int yearOfPublication;
+    private String imageUrl;
+    private String description;
+
 
     // AUDIOBOOK-specific fields
     private Integer lengthInMinutes;

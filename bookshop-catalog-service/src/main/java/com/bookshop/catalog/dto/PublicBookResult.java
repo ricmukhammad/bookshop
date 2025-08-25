@@ -26,4 +26,9 @@ public class PublicBookResult {
     private ProductType productType;
     private int rating;
     private List<Review> reviews;
+    private String language;
+    private int yearOfPublication;
+    private int numberOfPages;
+    private String imageUrl;
+    private String description;
 }

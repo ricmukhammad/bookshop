@@ -28,8 +28,13 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
     @Override
     public Page<Book> getAllByGetBookParam(GetBookParam param, Pageable pageable) {
         var criteriaList = createCriteria(param);
-        var query = new Query();
-        criteriaList.forEach(query::addCriteria);
+        Query query;
+        if (criteriaList.isEmpty()) {
+            query = new Query();
+        } else {
+            query = new Query();
+            criteriaList.forEach(query::addCriteria);
+        }
         return PageableExecutionUtils.getPage(
                 mongoTemplate.find(query.with(pageable), Book.class),
                 pageable,
@@ -52,11 +57,15 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
         if (Objects.nonNull(param.getProductType())) {
             criteriaList.add(Criteria.where(PRODUCT_TYPE).is(param.getProductType().toUpperCase()));
         }
-        if (Objects.nonNull(param.getAuthor().getFirstName())) {
-            criteriaList.add(Criteria.where(AUTHORS_FIRST_NAME).is(param.getAuthor().getFirstName()));
+        if (Objects.nonNull(param.getAuthor())) {
+            if (Objects.nonNull(param.getAuthor().getFirstName())) {
+                criteriaList.add(Criteria.where(AUTHORS_FIRST_NAME).is(param.getAuthor().getFirstName()));
+            }
         }
-        if (Objects.nonNull(param.getAuthor().getLastName())) {
-            criteriaList.add(Criteria.where(AUTHORS_LAST_NAME).is(param.getAuthor().getLastName()));
+        if (Objects.nonNull(param.getAuthor())) {
+            if (Objects.nonNull(param.getAuthor().getLastName())) {
+                criteriaList.add(Criteria.where(AUTHORS_LAST_NAME).is(param.getAuthor().getLastName()));
+            }
         }
         return criteriaList;
     }

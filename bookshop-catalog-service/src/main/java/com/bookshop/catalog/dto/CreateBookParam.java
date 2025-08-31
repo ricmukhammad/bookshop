@@ -45,6 +45,12 @@ public class CreateBookParam {
     private int yearOfPublication;
     private String imageUrl;
     private String description;
+    @NotNull
+    private int weight;
+    @NotNull
+    private int loyaltyPointsToEarn;
+    private Double discountPrice;
+
 
 
     // AUDIOBOOK-specific fields

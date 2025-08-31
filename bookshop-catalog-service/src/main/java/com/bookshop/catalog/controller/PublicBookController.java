@@ -50,7 +50,7 @@ public class PublicBookController {
             summary = "Endpoint that allows to get public books filtered by params",
             description = "No authorization is required. Returned data has limited, publicly allowed information on the products"
     )
-    @PostMapping("/books/filter")
+    @PostMapping("/filter")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok"),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),

@@ -23,6 +23,7 @@ public class Book {
     private Set<Author> authors;
     private Set<Category> categories;
     private Double price;
+    private Double discountPrice;
     private Double cost;
     private int edition;
     private ProductType productType;
@@ -31,8 +32,10 @@ public class Book {
     private int numberOfPages;
     private String language;
     private int yearOfPublication;
+    private int weight;
     private String imageUrl;
     private String description;
+    private int loyaltyPointsToEarn;
 }
 
 

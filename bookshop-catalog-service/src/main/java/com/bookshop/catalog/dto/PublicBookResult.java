@@ -22,13 +22,16 @@ public class PublicBookResult {
     private Set<Author> authors;
     private Set<Category> categories;
     private Double price;
+    private Double discountPrice;
     private int edition;
     private ProductType productType;
     private int rating;
     private List<Review> reviews;
     private String language;
     private int yearOfPublication;
+    private int weight;
     private int numberOfPages;
     private String imageUrl;
     private String description;
+    private String loyaltyPointsToEarn;
 }

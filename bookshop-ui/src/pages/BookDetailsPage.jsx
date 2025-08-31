@@ -1,97 +1,191 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import BookDetailsPageInfoTable from "../components/BookDetailsPageInfoTable.jsx";
+import React, {useEffect, useState} from 'react';
+import {
+    BookOpenIcon,
+    ClockIcon,
+    LinkIcon,
+    ShareIcon,
+    ShoppingCartIcon,
+    StarIcon,
+    TruckIcon
+} from '@heroicons/react/24/outline';
+import BookDetails from "../components/BookDetails.jsx";
+import BookDescription from "../components/BookDescription.jsx";
+import OtherBooksByAuthor from "../components/OtherBooksByAuthor.jsx";
+import {getBookById} from "../api/BooksClient.js";
+import {useShoppingCart} from "../hooks/ShoppingCartContext.jsx";
+import {useParams} from "react-router-dom";
+import {addToCart, getTotalPriceOfBooks} from "../utils/cartService.js";
 
-export default function BookDetailsPage() {
-    const { id } = useParams();
-    const [book, setBook] = useState(null);
+const BookDetailsPage = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [book, setBook] = useState();
+    const [toastBook, setToastBook] = useState(false);
+    const {setTotalPrice} = useShoppingCart()
+    const {id} = useParams()
+
 
     useEffect(() => {
-        // TODO: replace with your API call
-        // fetch(`/api/books/${id}`).then(res => res.json()).then(setBook);
-        setBook({
-            id,
-            isbn: "123456789",
-            title: "Önbizalom",
-            authors: [{ firstName: "Roxie", lastName: "Nafousi" }],
-            categories: ["SELF-HELP", "PSYCHOLOGY"],
-            price: 18.99,
-            edition: 1,
-            productType: "PAPER",
-            rating: 4,
-            reviews: [],
-            language: "Hungarian",
-            yearOfPublication: 2024,
-            numberOfPages: 220,
-            imageUrl: "https://placehold.co/300x400/png",
-        });
-    }, [id]);
+        setLoading(true);
+        setError(null);
 
-    if (!book) return <p>Loading...</p>;
+        getBookById(id)
+            .then((response) => {
+                console.log(response);
+                setBook(response)
+            })
+            .catch((err) => {
+                console.error(`Error occurred when fetching books: ${err}`);
+                setError("Failed to load books. Please try again.");
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
+
+    const handleAddToCart = () => {
+        addToCart(book);
+        setTotalPrice(getTotalPriceOfBooks)
+    };
+
+    // Helper to render star rating
+    const renderStarRating = (rating) => {
+        return (
+            <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                    <StarIcon
+                        key={i}
+                        className={`h-5 w-5 ${i < rating ? 'text-yellow-400' : 'text-gray-300'} fill-current`}
+                    />
+                ))}
+            </div>
+        );
+    };
 
     return (
-        <div className="bg-brand-background min-h-screen py-12">
-            <div className="container mx-auto px-6 flex flex-col md:flex-row gap-12">
-                {/* Left: Book Cover */}
-                <div className="flex-shrink-0">
-                    <img
-                        src={book.imageUrl}
-                        alt={book.title}
-                        className="w-72 md:w-80 rounded-lg shadow-lg"
-                    />
+        <div className="min-h-screen bg-whitep-4 sm:p-8 font-sans antialiased">
+            {loading && (
+                <div className="text-center py-20 text-gray-600">Loading books...</div>
+            )}
+
+            {error && !loading && (
+                <div className="text-center py-20 text-red-600 font-medium">
+                    {error}
                 </div>
+            )}
 
-                {/* Right: Book Info */}
-                <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-brand-primary-yellow mb-2">{book.title}</h1>
-                    <p className="text-lg text-brand-textMuted mb-4">
-                        by {book.authors.map(a => `${a.firstName} ${a.lastName}`).join(", ")}
-                    </p>
+            {book &&
+                <div className="container mx-auto bg-white  p-6 lg:p-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Left Column: Book Cover and Actions */}
+                        <div className="lg:col-span-1 flex flex-col items-center">
+                            <div className="relative mb-6 rounded-lg overflow-hidden shadow-md">
+                                <img src={book.imageUrl} alt={book.title}
+                                     className="w-48 h-auto object-cover rounded-lg"/>
+                                {book.discountPrice &&
+                                    <div
+                                        className="absolute bottom-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full flex items-center shadow-md">
+                                        <span className="mr-1">+</span> on sale
+                                    </div>
+                                }
+                            </div>
 
-                    {/*<div className="space-y-1 mb-6 text-brand-text">*/}
-                    {/*    <p><span className="font-medium">Language:</span> {book.language}</p>*/}
-                    {/*    <p><span className="font-medium">Year:</span> {book.yearOfPublication}</p>*/}
-                    {/*    <p><span className="font-medium">Pages:</span> {book.numberOfPages}</p>*/}
-                    {/*    <p><span className="font-medium">Categories:</span> {book.categories.join(", ")}</p>*/}
-                    {/*    <p><span className="font-medium">ISBN:</span> {book.isbn}</p>*/}
-                    {/*</div>*/}
-
-                    <BookDetailsPageInfoTable book={book}/>
-
-                    {/* Price + Cart Button */}
-                    <div className="flex items-center gap-4 mb-8">
-                        <p className="text-3xl font-bold text-brand-secondary">
-                            {book.price.toFixed(2)} €
-                        </p>
-                        <button className="bg-brand-primary-yellow hover:bg-brand-primary-yellowDark text-white px-6 py-3 rounded-lg font-semibold shadow-md">
-                            🛒 Add to Cart
-                        </button>
-                    </div>
-
-                    {/* Tabs (Description / Reviews / Details) */}
-                    <div>
-                        <div className="border-b border-gray-300 mb-4 flex gap-6">
-                            <button className="pb-2 border-b-2 border-brand-primary-yellow font-medium">
-                                Description
-                            </button>
-                            <button className="pb-2 text-gray-500 hover:text-brand-primary-yellow">
-                                Reviews
-                            </button>
-                            <button className="pb-2 text-gray-500 hover:text-brand-primary-yellow">
-                                Details
-                            </button>
+                            <div className="flex mt-6 space-x-3 w-full max-w-xs justify-center">
+                                <button className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                                    <ShareIcon className="h-5 w-5 text-gray-600"/>
+                                </button>
+                                <button className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                                    <LinkIcon className="h-5 w-5 text-gray-600"/>
+                                </button>
+                                <button className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                                    <BookOpenIcon className="h-5 w-5 text-gray-600"/>
+                                </button>
+                            </div>
                         </div>
 
-                        <div>
-                            <p className="text-brand-text leading-relaxed">
-                                {/* TODO: replace with actual description field */}
-                                This book is a transformative journey into self-confidence and resilience,
-                                offering readers practical tools to navigate modern challenges.
-                            </p>
+                        <div className="lg:col-span-1">
+                            {book.authors.map((author, index) => (
+                                <p key={index}
+                                   className="text-sm text-gray-500 mb-1">{author.firstName} {author.lastName}</p>
+                            ))}
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">{book.title}</h1>
+
+                            <div className="flex items-center mb-6">
+                                {renderStarRating(book.rating)}
+                                <span className="ml-2 text-sm text-gray-600">({book.reviews.length} reviews)</span>
+                            </div>
+
+                            <BookDescription description={book.description}/>
+
+                            <BookDetails book={book}/>
+                        </div>
+
+                        {/* Right Column: Pricing and Add to Cart */}
+                        <div className="lg:col-span-1">
+                            <div className="text-lg mb-4">
+                                {book.discountPrice ? (
+                                    <p className="line-through text-gray-500 flex items-center">
+                                        Original price: {book.price}
+                                    </p>
+                                ) : (
+                                    <p className="text-gray-900 flex items-center">
+                                        Price: {book.price}
+                                    </p>
+                                )}
+                                <p className="text-green-700 flex items-center">
+                                    Free shipping over 15,000 HUF
+                                </p>
+                                {book.discountPrice &&
+                                    <p className="text-2xl font-bold text-gray-900 mt-2">
+                                        Discount price: {book.discountPrice}
+                                    </p>}
+                            </div>
+
+                            <button
+                                onClick={handleAddToCart}
+                                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md flex items-center justify-center text-lg"
+                            >
+                                <ShoppingCartIcon className="h-6 w-6 mr-3"/>
+                                Add to cart
+                            </button>
+
+                            <div className="mt-8 p-6 bg-gray-50 rounded-xl shadow-inner border border-gray-200">
+                                <h3 className="font-semibold text-gray-800 mb-2">By purchasing this product:</h3>
+                                <p className="text-gray-700 mb-4">
+                                    You can score: <span
+                                    className="font-bold text-green-700">{book.loyaltyPointsToEarn} points</span>
+                                </p>
+                                <div className="flex items-center bg-gray-100 p-3 rounded-lg text-sm">
+                                    <img src="https://placehold.co/30x30/e2e8f0/000000?text=👤" alt="Loyal Customer"
+                                         className="rounded-full mr-3"/>
+                                    <p className="text-gray-700">
+                                        Become our Loyal Customer and get up to <span
+                                        className="font-bold">10% back</span> on your card.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Store information section */}
+                            <div
+                                className="mt-8 p-6 bg-gray-50 rounded-xl shadow-inner border border-gray-200 space-y-4 text-gray-700">
+                                <div className="flex items-center">
+                                    <ClockIcon
+                                        className="h-5 w-5 mr-3 text-gray-500"/> {/* Using ClockIcon for delivery time */}
+                                    <span>Personal collection 2-5 days (free)</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <TruckIcon
+                                        className="h-6 w-6 mr-3 text-gray-500"/> {/* Using ClockIcon for delivery time */}
+                                    <span>Home delivery 2-5 days (Free over 10,000 HUF)</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
+            <OtherBooksByAuthor/>
         </div>
     );
-}
+};
+
+export default BookDetailsPage;

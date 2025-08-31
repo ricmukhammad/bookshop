@@ -1,17 +1,13 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import {StrictMode} from 'react'
+import {createRoot} from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import BookDetailPage from "./pages/BookDetailsPage.jsx";
+import ShoppingCartContext from "./hooks/ShoppingCartContext.jsx";
+import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<App />} />
-                <Route path="/books/:id" element={<BookDetailPage />} />
-            </Routes>
-        </BrowserRouter>
+        <ShoppingCartContext>
+            <App/>
+        </ShoppingCartContext>
     </StrictMode>
 );

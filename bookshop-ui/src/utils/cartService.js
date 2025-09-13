@@ -10,13 +10,18 @@ export function addToCart(book) {
 
     const existingIndex = cart.findIndex((item) => item.id === book.id);
     if (existingIndex !== -1) {
-        cart[existingIndex].quantity += 1;
+        return;
     } else {
         cart.push({ ...book, quantity: 1 });
     }
 
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
     return cart;
+}
+
+export function isBookExist(book) {
+    let cart = getCart();
+    return cart.find((item) => item.id === book.id);
 }
 
 export function removeFromCart(bookId) {
@@ -35,4 +40,24 @@ export function getTotalPriceOfBooks(){
         total += getCart()[i].quantity * getCart()[i].price;
     }
     return total.toFixed(2)
+}
+
+export function increaseQuantity(id) {
+    const cart = getCart();
+    const updated = cart.map(item =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    );
+    localStorage.setItem(CART_KEY, JSON.stringify(updated));
+    return updated;
+}
+
+export function decreaseQuantity(id) {
+    const cart = getCart();
+    const updated = cart.map(item =>
+        item.id === id && item.quantity > 1
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+    );
+    localStorage.setItem(CART_KEY, JSON.stringify(updated));
+    return updated;
 }

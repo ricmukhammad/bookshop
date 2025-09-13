@@ -1,62 +1,13 @@
 import { BookOpenIcon } from '@heroicons/react/24/outline';
+import {addToCart, getTotalPriceOfBooks, isBookExist} from "../utils/cartService.js";
+import {useShoppingCart} from "../hooks/ShoppingCartContext.jsx";
+import React, {useState} from "react";
+import BookAddedNotification from "./BookAddedNotification.jsx";
 
-const OtherBooksByAuthor = () => {
-    const otherBooks = [
-        {
-            id: '101',
-            title: 'Spectacular',
-            author: 'Stephanie Garber',
-            coverImage: 'https://placehold.co/120x180/d1d5db/4a4a4a?text=BOOK+A', // Placeholder image
-            publisherInfo: 'Kiadvó ár: 4 749 Ft',
-            onlinePrice: '4 749 Ft',
-            action: false, // Indicates if there's an 'akció' tag
-        },
-        {
-            id: '102',
-            title: 'Egy átok az igaz szerelemért',
-            author: 'Stephanie Garber',
-            coverImage: 'https://placehold.co/120x180/d1d5db/4a4a4a?text=BOOK+B', // Placeholder image
-            publisherInfo: 'Eredeti ár: 4 749 Ft',
-            onlinePrice: '4 749 Ft',
-            action: false,
-        },
-        {
-            id: '103',
-            title: 'Once Upon a Broken Heart',
-            author: 'Stephanie Garber',
-            coverImage: 'https://placehold.co/120x180/d1d5db/4a4a4a?text=BOOK+C', // Placeholder image
-            publisherInfo: 'Eredeti ár: 6 690 Ft',
-            onlinePrice: '6 355 Ft',
-            action: false,
-        },
-        {
-            id: '104',
-            title: 'A soha többé balladája',
-            author: 'Stephanie Garber',
-            coverImage: 'https://placehold.co/120x180/d1d5db/4a4a4a?text=BOOK+D', // Placeholder image
-            publisherInfo: 'Eredeti ár: 4 999 Ft',
-            onlinePrice: '4 749 Ft',
-            action: true,
-        },
-        {
-            id: '105',
-            title: 'Legendary - puha kötés',
-            author: 'Stephanie Garber',
-            coverImage: 'https://placehold.co/120x180/d1d5db/4a4a4a?text=BOOK+E', // Placeholder image
-            publisherInfo: 'Eredeti ár: 5 499 Ft',
-            onlinePrice: '5 224 Ft',
-            action: false,
-        },
-        {
-            id: '106',
-            title: 'Finale - puha kötés',
-            author: 'Stephanie Garber',
-            coverImage: 'https://placehold.co/120x180/d1d5db/4a4a4a?text=BOOK+F', // Placeholder image
-            publisherInfo: 'Eredeti ár: 5 499 Ft',
-            onlinePrice: '5 224 Ft',
-            action: true,
-        }
-    ];
+const OtherBooksByAuthor = ({otherBooksByAuthors}) => {
+    const {setTotalPrice} = useShoppingCart()
+    const [toastBook, setToastBook] = useState(false);
+
 
     const scrollContainer = (direction) => {
         const container = document.getElementById('book-carousel-container');
@@ -70,13 +21,20 @@ const OtherBooksByAuthor = () => {
         }
     };
 
-    const handleAddToCart = (bookTitle) => {
-        console.log(`Adding "${bookTitle}" to cart.`);
-        //TODO Implement actual add to cart logic here
+    const handleAddToCart = (book) => {
+        addToCart(book);
+        setTotalPrice(getTotalPriceOfBooks)
+        setToastBook(book)
     };
 
     return (
         <div className="min-h-screen bg-white p-4 sm:p-8 font-sans antialiased">
+            {toastBook && (
+                <BookAddedNotification
+                    book={toastBook}
+                    onClose={() => setToastBook(null)}
+                />
+            )}
             <div className="container mx-auto bg-white p-6 lg:p-10">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-900">Other books by author</h2>
@@ -106,13 +64,13 @@ const OtherBooksByAuthor = () => {
                     id="book-carousel-container"
                     className="flex overflow-x-scroll scroll-container pb-4 -mx-4 sm:-mx-6 lg:-mx-10 px-4 sm:px-6 lg:px-10"
                 >
-                    {otherBooks.map((book) => (
+                    {otherBooksByAuthors.map((book) => (
                         <div key={book.id}
                              className="flex-none w-40 md:w-40 lg:w-40 mr-6 last:mr-0"> {/* Adjust width and margin as needed */}
                             <div
                                 className="bg-white transition-shadow duration-200 h-full flex flex-col pr-2 py-4">
                                 <div className="relative mb-4 mx-4 flex-shrink-0">
-                                    <img src={book.coverImage} alt={book.title}
+                                    <img src={book.imageUrl} alt={book.title}
                                          className="w-full h-auto object-cover rounded-md mx-auto"/>
                                     {book.action && (
                                         <div
@@ -124,19 +82,31 @@ const OtherBooksByAuthor = () => {
                                 <div className="flex-grow flex flex-col justify-between">
                                     <div className="flex flex-col h-full">
                                         <h3 className="text-base font-semibold text-gray-800 mb-1 leading-tight">{book.title}</h3>
-                                        <p className="text-sm text-gray-600 mb-2">{book.author}</p>
+                                        {book.authors.map((author, index) => (
+                                            <p key={index}
+                                               className="text-xs text-gray-600 mb-2">{author.firstName} {author.lastName}</p>
+                                        ))}
                                         <div className="flex items-center text-blue-600 text-sm mb-3 mt-auto">
                                             <BookOpenIcon className="h-4 w-4 mr-1"/>
                                             <span>Book</span>
                                         </div>
                                         <p className="text-lg font-bold text-gray-900 mt-auto">{book.onlinePrice}</p>
                                     </div>
-                                    <button
-                                        onClick={() => handleAddToCart(book.title)}
-                                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm text-sm mt-4"
-                                    >
-                                        Add to cart
-                                    </button>
+                                    {isBookExist(book) ? (
+                                        <button
+                                            disabled
+                                            className="w-full bg-gray-300 text-gray-600 font-semibold py-2 px-4 rounded-lg shadow-inner text-sm mt-4 cursor-not-allowed"
+                                        >
+                                            Already in Cart
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleAddToCart(book)}
+                                            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm text-sm mt-4"
+                                        >
+                                            Add to Cart
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>

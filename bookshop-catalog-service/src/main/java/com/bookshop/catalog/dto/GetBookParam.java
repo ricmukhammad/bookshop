@@ -16,5 +16,5 @@ import lombok.NoArgsConstructor;
 public class GetBookParam {
     private String productType;
     private Set<String> categories;
-    private Author author;
+    private Set<Author> authors;
 }

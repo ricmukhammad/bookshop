@@ -5,6 +5,7 @@ import BookDetailPage from "./pages/BookDetailsPage.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
+import SearchResultsPage from "./pages/SearchResultsPage.jsx";
 
 export const RoutesController = () => {
     return (
@@ -15,6 +16,7 @@ export const RoutesController = () => {
                     <Route path="/books/:id" element={<BookDetailPage/>}/>
                     <Route path={"/login"} element={<LoginPage/>}/>
                     <Route path={"/register"} element={<RegisterPage/>}/>
+                    <Route path={"/search"} element={<SearchResultsPage/>}/>
                 </Routes>
             <Footer/>
         </Router>

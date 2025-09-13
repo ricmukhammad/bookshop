@@ -11,16 +11,18 @@ import {
 import BookDetails from "../components/BookDetails.jsx";
 import BookDescription from "../components/BookDescription.jsx";
 import OtherBooksByAuthor from "../components/OtherBooksByAuthor.jsx";
-import {getBookById} from "../api/BooksClient.js";
+import {getBookById, getBooksByAuthors} from "../api/BooksClient.js";
 import {useShoppingCart} from "../hooks/ShoppingCartContext.jsx";
 import {useParams} from "react-router-dom";
-import {addToCart, getTotalPriceOfBooks} from "../utils/cartService.js";
+import {addToCart, getTotalPriceOfBooks, isBookExist} from "../utils/cartService.js";
+import BookAddedNotification from "../components/BookAddedNotification.jsx";
 
 const BookDetailsPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [book, setBook] = useState();
     const [toastBook, setToastBook] = useState(false);
+    const [otherBooksByAuthors, setOtherBooksByAuthors] = useState([]);
     const {setTotalPrice} = useShoppingCart()
     const {id} = useParams()
 
@@ -31,21 +33,31 @@ const BookDetailsPage = () => {
 
         getBookById(id)
             .then((response) => {
-                console.log(response);
-                setBook(response)
+                console.log("Book:", response);
+                setBook(response);
+                if (response.authors && response.authors.length > 0) {
+                    return getBooksByAuthors(response.authors);
+                }
+            })
+            .then((relatedBooks) => {
+                if (relatedBooks) {
+                    console.log("Other books by authors:", relatedBooks.content);
+                    setOtherBooksByAuthors(relatedBooks.content);
+                }
             })
             .catch((err) => {
-                console.error(`Error occurred when fetching books: ${err}`);
+                console.error("Error occurred:", err);
                 setError("Failed to load books. Please try again.");
             })
             .finally(() => {
                 setLoading(false);
             });
-    }, []);
+    }, [id]);
 
     const handleAddToCart = () => {
         addToCart(book);
         setTotalPrice(getTotalPriceOfBooks)
+        setToastBook(book)
     };
 
     // Helper to render star rating
@@ -63,7 +75,14 @@ const BookDetailsPage = () => {
     };
 
     return (
+
         <div className="min-h-screen bg-whitep-4 sm:p-8 font-sans antialiased">
+            {toastBook && (
+                <BookAddedNotification
+                    book={toastBook}
+                    onClose={() => setToastBook(null)}
+                />
+            )}
             {loading && (
                 <div className="text-center py-20 text-gray-600">Loading books...</div>
             )}
@@ -141,13 +160,23 @@ const BookDetailsPage = () => {
                                     </p>}
                             </div>
 
-                            <button
-                                onClick={handleAddToCart}
-                                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md flex items-center justify-center text-lg"
-                            >
-                                <ShoppingCartIcon className="h-6 w-6 mr-3"/>
-                                Add to cart
-                            </button>
+                            {isBookExist(book) ? (
+                                <button
+                                    disabled
+                                    className="w-full bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg shadow-inner flex items-center justify-center text-lg cursor-not-allowed"
+                                >
+                                    <ShoppingCartIcon className="h-6 w-6 mr-3 text-gray-500" />
+                                    Already in Cart
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md flex items-center justify-center text-lg"
+                                >
+                                    <ShoppingCartIcon className="h-6 w-6 mr-3" />
+                                    Add to Cart
+                                </button>
+                            )}
 
                             <div className="mt-8 p-6 bg-gray-50 rounded-xl shadow-inner border border-gray-200">
                                 <h3 className="font-semibold text-gray-800 mb-2">By purchasing this product:</h3>
@@ -183,7 +212,7 @@ const BookDetailsPage = () => {
                     </div>
                 </div>
             }
-            <OtherBooksByAuthor/>
+            <OtherBooksByAuthor otherBooksByAuthors={otherBooksByAuthors}/>
         </div>
     );
 };

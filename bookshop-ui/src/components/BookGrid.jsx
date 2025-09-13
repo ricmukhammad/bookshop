@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {getBooks} from "../api/BooksClient.js";
 import Pagination from "./Pagination.jsx";
-import {addToCart, getTotalPriceOfBooks} from "../utils/cartService.js";
+import {addToCart, getTotalPriceOfBooks, isBookExist} from "../utils/cartService.js";
 import BookAddedNotification from "./BookAddedNotification.jsx";
 import {useShoppingCart} from "../hooks/ShoppingCartContext.jsx";
 import {Link} from "react-router-dom";
@@ -98,10 +98,21 @@ export default function BookGrid() {
                                         Price:{" "}
                                         <span className="font-bold text-yellow-600">{book.price} $</span>
                                     </p>
-                                    <button onClick={()=> handleAddToCart(book)}
-                                        className="w-full bg-yellow-700 hover:bg-yellow-800 text-white py-1.5 rounded-md text-sm font-medium">
-                                        Add to Cart
-                                    </button>
+                                    {isBookExist(book) ? (
+                                        <button
+                                            disabled
+                                            className="w-full bg-gray-300 text-gray-600 py-1.5 rounded-md text-sm font-medium cursor-not-allowed"
+                                        >
+                                            Already in Cart
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleAddToCart(book)}
+                                            className="w-full bg-yellow-700 hover:bg-yellow-800 text-white py-1.5 rounded-md text-sm font-medium"
+                                        >
+                                            Add to Cart
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

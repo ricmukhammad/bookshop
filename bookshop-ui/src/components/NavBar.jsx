@@ -1,10 +1,15 @@
 import {useState} from "react";
 import {FaBars, FaSearch, FaShoppingBag, FaTimes} from "react-icons/fa";
 import {useShoppingCart} from "../hooks/ShoppingCartContext.jsx";
+import {useAuth} from "../hooks/AuthContext.jsx";
+import ProfileDropdown from "./ProfileDropdown.jsx";
+import {Link} from "react-router-dom";
+import SearchBar from "./SearchBar.jsx";
 
 export default function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const {setShowShoppingCart, totalPrice} = useShoppingCart()
+    const {user, logout} = useAuth();
 
     const navLinks = [
         "Books",
@@ -27,28 +32,35 @@ export default function Navbar() {
                 </div>
 
                 {/* Search (hidden on mobile) */}
-                <div className="hidden md:flex flex-1 mx-6 max-w-2xl">
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        className="flex-1 border border-gray-300 px-4 py-2 focus:outline-none bg-gray-50"
-                    />
-                    <button className="px-4 bg-yellow-700 text-white hover:bg-yellow-800">
-                        <FaSearch/>
-                    </button>
-                </div>
+                {/*<div className="hidden md:flex flex-1 mx-6 max-w-2xl">*/}
+                {/*    <input*/}
+                {/*        type="text"*/}
+                {/*        placeholder="Search..."*/}
+                {/*        className="flex-1 border border-gray-300 px-4 py-2 focus:outline-none bg-gray-50"*/}
+                {/*    />*/}
+                {/*    <button className="px-4 bg-yellow-700 text-white hover:bg-yellow-800">*/}
+                {/*        <FaSearch/>*/}
+                {/*    </button>*/}
+                {/*</div>*/}
+                <SearchBar/>
 
-                {/* User + Cart */}
                 <div className="flex items-center space-x-6">
-                    <a href="#" className="hidden md:inline text-sm text-gray-700 hover:underline">
-                        Login
-                    </a>
-                    <a href="#" className="hidden md:inline text-sm text-gray-700 hover:underline">
-                        Register
-                    </a>
+                    {user ? (
+                        <ProfileDropdown/>
+                    ) : (
+                        <div>
+                            <Link to="/login" className="hidden md:inline text-sm text-gray-700 hover:underline">
+                                Login
+                            </Link>
+                            <span className="hidden md:inline text-sm text-gray-700">/</span>
+                            <Link to="/register" className="hidden md:inline text-sm text-gray-700 hover:underline">
+                                Register
+                            </Link>
+                        </div>
+                    )}
                     <div
                         className="relative flex items-center space-x-2 cursor-pointer"
-                        onClick={()=> setShowShoppingCart(true)}
+                        onClick={() => setShowShoppingCart(true)}
                     >
                         <FaShoppingBag className="text-2xl text-gray-700"/>
                         <span className="hidden md:inline text-sm font-semibold">{totalPrice} $</span>
@@ -75,7 +87,7 @@ export default function Navbar() {
 
             {/* Mobile Menu Drawer */}
             {mobileOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex">
+                <div className="fixed inset-0 bg-opacity-50 z-50 flex">
                     <div className="bg-white w-64 h-full shadow-lg p-6 flex flex-col">
                         {/* Close button */}
                         <button
@@ -90,9 +102,9 @@ export default function Navbar() {
                             <input
                                 type="text"
                                 placeholder="Search..."
-                                className="flex-1 border border-gray-300 px-4 py-2 focus:outline-none bg-gray-50"
+                                className="flex-1 border border-gray-300 px-2 py-2 focus:outline-none bg-gray-50"
                             />
-                            <button className="px-4 bg-yellow-700 text-white hover:bg-yellow-800">
+                            <button className="px-2 bg-yellow-700 text-white hover:bg-yellow-800">
                                 <FaSearch/>
                             </button>
                         </div>
@@ -111,15 +123,16 @@ export default function Navbar() {
                             ))}
                         </nav>
 
-                        {/* Login/Register on mobile */}
-                        <div className="mt-8 border-t pt-4 space-y-2">
-                            <a href="#" className="block text-gray-700 hover:underline">
-                                Login
-                            </a>
-                            <a href="#" className="block text-gray-700 hover:underline">
-                                Register
-                            </a>
-                        </div>
+                        {!user &&
+                            <div className="mt-8 border-t pt-4 space-y-2">
+                                <a href="#" className="block text-gray-700 hover:underline">
+                                    Login
+                                </a>
+                                <a href="#" className="block text-gray-700 hover:underline">
+                                    Register
+                                </a>
+                            </div>
+                        }
                     </div>
 
                     {/* Clicking outside closes drawer */}

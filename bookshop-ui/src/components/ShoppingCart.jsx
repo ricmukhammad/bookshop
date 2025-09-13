@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import {Dialog, Transition} from '@headlessui/react'
-import {getCart, getTotalPriceOfBooks, removeFromCart} from "../utils/cartService.js";
-import empty_cart from "../assets/empty-cart-svgrepo-com.svg";
+import {getCart, getTotalPriceOfBooks, removeFromCart, increaseQuantity, decreaseQuantity} from "../utils/cartService.js";import empty_cart from "../assets/empty-cart-svgrepo-com.svg";
 import {XMarkIcon} from "@heroicons/react/24/outline/index.js";
 import {useShoppingCart} from "../hooks/ShoppingCartContext.jsx";
 
@@ -16,6 +15,16 @@ export default function ShoppingCart() {
     const handleRemove = (id) => {
         setCart(removeFromCart(id));
         setTotalPrice(getTotalPriceOfBooks())
+    };
+
+    const handleIncrease = (id) => {
+        setCart(increaseQuantity(id));
+        setTotalPrice(getTotalPriceOfBooks());
+    };
+
+    const handleDecrease = (id) => {
+        setCart(decreaseQuantity(id));
+        setTotalPrice(getTotalPriceOfBooks());
     };
 
     return (
@@ -87,7 +96,7 @@ export default function ShoppingCart() {
                                                                                 </h3>
                                                                                 <p className="ml-4">{product.price}$</p>
                                                                             </div>
-                                                                            {product.authors.map((author)=>
+                                                                            {product.authors.map((author) =>
                                                                                 <p className="mt-1 text-sm text-gray-500">{`${author.firstName}  ${author.lastName}`}</p>
                                                                             )}
                                                                             <p className="mt-1 text-sm font-bold text-gray-500">Total
@@ -96,24 +105,38 @@ export default function ShoppingCart() {
                                                                         <div
                                                                             className="flex flex-1 items-end justify-between text-sm pt-4">
                                                                             <p className="text-gray-500">Qty</p>
-                                                                            <div className='relative'>
-                                                                                <span
-                                                                                       className='block p-0 m-0  text-xs border-0 rounded w-11 h-5 leading-relaxed float-left'
-                                                                                >{product.quantity}</span>
-                                                                            </div>
-                                                                            <div className="flex">
+                                                                            <div
+                                                                                className="flex items-center space-x-2">
                                                                                 <button
-                                                                                    onClick={()=> handleRemove(product.id)}
-                                                                                    type="button"
-                                                                                    className="font-medium text-yellow-700 hover:text-yellow-600"
-                                                                                >
-                                                                                    Remove
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
+                                                                                     onClick={() => handleDecrease(product.id)}
+                                                                                 className="px-2 py-1 text-sm
+                                                                                bg-gray-200 rounded hover:bg-gray-300"
+                                                                                 >
+                                                                                 –
+                                                                            </button>
+                                                                            <span
+                                                                            className="w-6 text-center">{product.quantity}</span>
+                                                                            <button
+                                                                                 onClick={() => handleIncrease(product.id)}
+                                                                             className="px-2 py-1 text-sm bg-gray-200
+                                                                            rounded hover:bg-gray-300"
+                                                                             >
+                                                                            +
+                                                                        </button>
                                                                     </div>
+                                                                    <div className="flex">
+                                                                        <button
+                                                                            onClick={() => handleRemove(product.id)}
+                                                                            type="button"
+                                                                            className="font-medium text-yellow-700 hover:text-yellow-600"
+                                                                        >
+                                                                            Remove
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                </div>
                                                                 </li>
-                                                            ))
+                                                                ))
                                                             }
                                                         </ul>
                                                     </div>

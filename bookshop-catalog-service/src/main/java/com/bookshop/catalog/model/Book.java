@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @NoArgsConstructor
@@ -18,7 +19,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Book {
     @Id
     private String id;
+    @TextIndexed
     private String isbn;
+    @TextIndexed
     private String title;
     private Set<Author> authors;
     private Set<Category> categories;
@@ -34,6 +37,7 @@ public class Book {
     private int yearOfPublication;
     private int weight;
     private String imageUrl;
+    @TextIndexed
     private String description;
     private int loyaltyPointsToEarn;
 }

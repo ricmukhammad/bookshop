@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @NoArgsConstructor
@@ -15,6 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Author {
     @Id
     private Long id;
+    @TextIndexed
     private String firstName;
+    @TextIndexed
     private String lastName;
 }

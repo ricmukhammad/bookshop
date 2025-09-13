@@ -3,6 +3,8 @@ import Footer from "./components/Footer.jsx";
 import Navbar from "./components/NavBar.jsx";
 import BookDetailPage from "./pages/BookDetailsPage.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
 
 export const RoutesController = () => {
     return (
@@ -11,6 +13,8 @@ export const RoutesController = () => {
                 <Routes>
                     <Route path="/" element={<LandingPage/>}/>
                     <Route path="/books/:id" element={<BookDetailPage/>}/>
+                    <Route path={"/login"} element={<LoginPage/>}/>
+                    <Route path={"/register"} element={<RegisterPage/>}/>
                 </Routes>
             <Footer/>
         </Router>

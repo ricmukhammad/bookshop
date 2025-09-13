@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Google auth response with user details")
-public class GoogleAuthResponse {
+@Schema(description = "Auth response with user details")
+public class AuthResponse {
     private String accessToken;
     private Integer expiresIn;
     private User user;

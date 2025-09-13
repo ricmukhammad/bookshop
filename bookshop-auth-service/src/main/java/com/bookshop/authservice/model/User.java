@@ -24,4 +24,5 @@ public class User {
     private List<String> roles;
     private Instant createdAt;
     private AuthProvider authProvider;
+    private String password;
 }
